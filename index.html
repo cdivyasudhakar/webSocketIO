@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <script src='/socket.io/socket.io.js'></script>
+        <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>	
+		<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+     <style type='text/css'>
+     .div{
+     display-inline;
+     }
+     </style>
+    </head>
+    <body align="center">
+    
+     <div style="border-style:solid;">
+     <div style="display-inline:block;">
+    <form>
+    		            <p><h2><b>Live Sporting Event: Cricket</b></h2><br>
+    		            <h3>Live ball by ball Score:<span id="sre"></span></h3>
+    					<h3>Total Score :<span id="total"></span></h3>
+    					<h3>Commentator remarks :<span id="comm"></span></h3><br>
+    					</p>
+    	<input type="button" style="height:30px;width:60px;background-color:green;" id="send" value="TuneIn">&nbsp; &nbsp;
+    	<input type="button" style="height:30px;width:60px;background-color:red;" id="stop" value="TuneOut"> 
+  			
+   <br><br>
+    </form>
+    </div>
+    </div>
+    </body>
+       <script>
+       var sendButton = document.getElementById("send");
+       var stopButton = document.getElementById("stop");
+       var socket = io();
+      sendButton.onclick = function() {
+       var score=0;
+            socket.on('welcome', function(data) {
+                addMessage(data.message);
+
+                // Respond with a message including this clients' id sent from the server
+                socket.emit('i am client', {data: 'foo!', id: data.id});
+            });
+            socket.on('messe', function(data){
+            document.getElementById("sre").innerHTML=data.split(".")[0]+" runs";
+            num=Number(data.split(".")[0]);
+	        document.getElementById("comm").innerHTML=data.split(".")[1];
+      	    addScore(num);
+      		
+     
+    });
+            socket.on('error', console.error.bind(console));
+            socket.on('message', console.log.bind(console));
+         
+           function addScore(number){
+          		score=score+number;
+          		document.getElementById("total").innerHTML = score;     		
+          }
+          $("#total").html(score);
+         }
+         
+         stopButton.onclick = function(){
+         document.getElementById("sre").innerHTML="";
+           document.getElementById("comm").innerHTML="";
+             document.getElementById("total").innerHTML="";
+       socket.emit('end');
+      location.reload(true);
+
+    }
+        </script>
+</html>
